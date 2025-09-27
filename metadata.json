@@ -1,0 +1,5 @@
+{
+  "name": "Quản lý hộ gia đình",
+  "description": "Một ứng dụng web để quản lý thông tin hộ gia đình trong một tòa nhà, cho phép thêm, sửa và xóa thông tin các hộ và thành viên.",
+  "requestFramePermissions": []
+}
