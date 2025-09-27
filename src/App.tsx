@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Household, Gender } from './types';
 import HouseholdTable from './components/HouseholdTable';
 import HouseholdFormModal from './components/HouseholdFormModal';
@@ -27,13 +27,32 @@ type SortableKey = 'stt' | 'headOfHouseholdName' | 'apartmentNumber' | 'phone';
 type SortDirection = 'asc' | 'desc';
 
 const App: React.FC = () => {
-  const [households, setHouseholds] = useState<Household[]>(INITIAL_HOUSEHOLDS);
+  const [households, setHouseholds] = useState<Household[]>(() => {
+    try {
+      const savedHouseholds = window.localStorage.getItem('households');
+      if (savedHouseholds) {
+        return JSON.parse(savedHouseholds);
+      }
+    } catch (error) {
+      console.error('Could not load households from localStorage', error);
+    }
+    return INITIAL_HOUSEHOLDS;
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHousehold, setEditingHousehold] = useState<Household | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [genderFilter, setGenderFilter] = useState<Gender | 'All'>('All');
   const [sortConfig, setSortConfig] = useState<{ key: SortableKey; direction: SortDirection }>({ key: 'stt', direction: 'asc' });
   const [householdToDeleteId, setHouseholdToDeleteId] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('households', JSON.stringify(households));
+    } catch (error) {
+      console.error('Could not save households to localStorage', error);
+    }
+  }, [households]);
 
   const handleOpenAddModal = () => {
     setEditingHousehold(null);
