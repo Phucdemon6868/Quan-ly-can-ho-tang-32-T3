@@ -166,8 +166,8 @@ const App: React.FC = () => {
     const headers = ['STT', 'Số căn', 'Chủ hộ', 'SĐT', 'Ghi chú', 'Tên thành viên', 'Ngày sinh', 'Giới tính', 'Quan hệ'];
   
     const rows = sortedAndFilteredHouseholds.flatMap(household => {
-      const otherMembers = household.members.filter(m => m.name !== household.headOfHouseholdName);
-      if (otherMembers.length === 0) {
+      const members = household.members;
+      if (members.length === 0) {
         return [[
           household.stt,
           household.apartmentNumber,
@@ -177,7 +177,7 @@ const App: React.FC = () => {
           '', '', '', ''
         ]];
       }
-      return otherMembers.map(member => [
+      return members.map(member => [
         household.stt,
         household.apartmentNumber,
         household.headOfHouseholdName,

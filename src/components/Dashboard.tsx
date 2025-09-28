@@ -125,7 +125,7 @@ const DonutChartWithIcons: React.FC<{
 const Dashboard: React.FC<DashboardProps> = ({ households }) => {
   const stats = useMemo(() => {
     const totalHouseholds = households.length;
-    const totalResidents = households.reduce((acc, curr) => acc + curr.members.length, 0);
+    const totalResidents = households.reduce((acc, curr) => acc + 1 + curr.members.length, 0);
     
     const allChildren = households
       .flatMap(h => h.members)

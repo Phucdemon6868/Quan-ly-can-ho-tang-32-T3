@@ -99,7 +99,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
               <tr><td colSpan={numberOfColumns} className="px-6 py-12 text-center text-gray-500">{getEmptyStateMessage()}</td></tr>
             ) : (
               households.map((household) => {
-                const membersToDisplay = household.members.filter(member => member.name !== household.headOfHouseholdName);
+                const membersToDisplay = household.members;
                 return (
                 <React.Fragment key={household.id}>
                   <tr className="hover:bg-gray-50 transition-colors duration-150">
@@ -165,7 +165,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
           </div>
         ) : (
           households.map((household) => {
-            const membersToDisplay = household.members.filter(member => member.name !== household.headOfHouseholdName);
+            const membersToDisplay = household.members;
             return (
             <div key={household.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-shadow duration-300 hover:shadow-lg">
               <div className="p-5">
