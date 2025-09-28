@@ -72,24 +72,28 @@ const Dashboard: React.FC<DashboardProps> = ({ households }) => {
       {stats.totalChildren > 0 && (
         <div className="bg-white p-6 rounded-xl shadow">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Phân bổ giới tính trẻ em</h3>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-blue-700">Nam</span>
-                <span className="text-sm font-semibold text-blue-700">{stats.maleChildren} ({malePercentage.toFixed(1)}%)</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div className="bg-blue-500 h-2.5 rounded-full" style={{ width: `${malePercentage}%` }}></div>
-              </div>
+          
+          <div className="w-full bg-gray-200 rounded-full h-4 my-2 flex overflow-hidden">
+            <div 
+              className="bg-blue-500 h-4 transition-all duration-500" 
+              style={{ width: `${malePercentage}%` }}
+              title={`Nam: ${malePercentage.toFixed(1)}%`}
+            ></div>
+            <div 
+              className="bg-pink-500 h-4 transition-all duration-500" 
+              style={{ width: `${femalePercentage}%` }}
+              title={`Nữ: ${femalePercentage.toFixed(1)}%`}
+            ></div>
+          </div>
+          
+          <div className="flex justify-between items-center mt-3 text-sm text-gray-600">
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+              <span>Nam: <strong>{stats.maleChildren}</strong> ({malePercentage.toFixed(1)}%)</span>
             </div>
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-pink-700">Nữ</span>
-                <span className="text-sm font-semibold text-pink-700">{stats.femaleChildren} ({femalePercentage.toFixed(1)}%)</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div className="bg-pink-500 h-2.5 rounded-full" style={{ width: `${femalePercentage}%` }}></div>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-pink-500"></span>
+              <span>Nữ: <strong>{stats.femaleChildren}</strong> ({femalePercentage.toFixed(1)}%)</span>
             </div>
           </div>
         </div>
