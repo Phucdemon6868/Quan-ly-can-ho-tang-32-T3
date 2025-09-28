@@ -84,20 +84,20 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="headOfHouseholdName" className="block text-sm font-medium text-gray-700 mb-1">Tên chủ hộ</label>
-                <input type="text" name="headOfHouseholdName" value={householdData.headOfHouseholdName} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required />
+                <input type="text" name="headOfHouseholdName" value={householdData.headOfHouseholdName} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
               </div>
               <div>
                 <label htmlFor="apartmentNumber" className="block text-sm font-medium text-gray-700 mb-1">Số căn hộ</label>
-                <input type="text" name="apartmentNumber" value={householdData.apartmentNumber} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required />
+                <input type="text" name="apartmentNumber" value={householdData.apartmentNumber} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
               </div>
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
-                <input type="tel" name="phone" value={householdData.phone} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                <input type="tel" name="phone" value={householdData.phone} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
               </div>
             </div>
             <div>
               <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
-              <textarea name="notes" value={householdData.notes} onChange={handleInputChange} rows={2} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+              <textarea name="notes" value={householdData.notes} onChange={handleInputChange} rows={2} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
             </div>
 
             <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 pt-4">Danh sách thành viên</h3>
@@ -128,7 +128,7 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
                   </div>
                 </div>
               ))}
-              <button type="button" onClick={handleAddMember} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 border-2 border-dashed border-gray-300 rounded-md hover:bg-indigo-50 transition-colors">
+              <button type="button" onClick={handleAddMember} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 border-2 border-dashed border-gray-300 rounded-md hover:bg-blue-50 transition-colors">
                 <PlusIcon className="w-5 h-5" />
                 Thêm thành viên
               </button>
@@ -136,7 +136,7 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
           </div>
           <div className="p-4 md:p-6 bg-gray-50 border-t flex justify-end gap-3">
             <button type="button" onClick={onClose} className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Hủy</button>
-            <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700">Lưu</button>
+            <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">Lưu</button>
           </div>
         </form>
       </div>

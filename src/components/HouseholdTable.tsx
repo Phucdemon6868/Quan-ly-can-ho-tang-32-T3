@@ -6,6 +6,10 @@ import ChevronDownIcon from './icons/ChevronDownIcon';
 import ChevronUpIcon from './icons/ChevronUpIcon';
 import SortAscIcon from './icons/SortAscIcon';
 import SortDescIcon from './icons/SortDescIcon';
+import BuildingOfficeIcon from './icons/BuildingOfficeIcon';
+import PhoneIcon from './icons/PhoneIcon';
+import UsersIcon from './icons/UsersIcon';
+import ClipboardDocumentListIcon from './icons/ClipboardDocumentListIcon';
 
 type SortableKey = 'stt' | 'headOfHouseholdName' | 'apartmentNumber' | 'phone';
 
@@ -151,45 +155,61 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
           </div>
         ) : (
           households.map((household) => (
-            <div key={household.id} className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="p-4">
+            <div key={household.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-shadow duration-300 hover:shadow-lg">
+              <div className="p-5">
                 <div className="flex justify-between items-start">
-                  <div className="flex-grow min-w-0">
-                    <p className="text-lg font-semibold text-red-600 truncate" title={household.headOfHouseholdName}>{household.headOfHouseholdName}</p>
-                    <p className="text-sm text-gray-600">Số căn: {household.apartmentNumber}</p>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <BuildingOfficeIcon className="w-5 h-5 text-gray-400" />
+                    <span className="font-semibold">Số căn: {household.apartmentNumber}</span>
+                    <span className="text-gray-400">|</span>
+                    <span className="font-semibold">STT: {household.stt}</span>
                   </div>
-                  <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
-                    <button onClick={() => onEdit(household)} className="text-blue-600 hover:text-blue-900 p-2 rounded-full hover:bg-gray-100" title="Chỉnh sửa"><PencilIcon /></button>
-                    <button onClick={() => onDelete(household.id)} className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-gray-100" title="Xóa"><TrashIcon /></button>
+                  <div className="flex items-center space-x-0 flex-shrink-0 -mr-2">
+                    <button onClick={() => onEdit(household)} className="text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-gray-100" title="Chỉnh sửa"><PencilIcon /></button>
+                    <button onClick={() => onDelete(household.id)} className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-gray-100" title="Xóa"><TrashIcon /></button>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-700 grid grid-cols-2 gap-x-4 gap-y-2">
-                  <p><span className="font-medium text-gray-500">STT:</span> {household.stt}</p>
-                  <p><span className="font-medium text-gray-500">Thành viên:</span> {household.members.length}</p>
-                  <p className="col-span-2"><span className="font-medium text-gray-500">SĐT:</span> {household.phone || 'N/A'}</p>
-                  {household.notes && <p className="col-span-2 mt-1"><span className="font-medium text-gray-500">Ghi chú:</span> {household.notes}</p>}
+                <div className="mt-4">
+                  <p className="text-xl font-bold text-blue-700 truncate" title={household.headOfHouseholdName}>{household.headOfHouseholdName}</p>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-200 space-y-3 text-sm">
+                  <div className="flex items-center gap-3 text-gray-700">
+                    <UsersIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    <span>{household.members.length} thành viên</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-gray-700">
+                    <PhoneIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    <span>{household.phone || 'Chưa có SĐT'}</span>
+                  </div>
+                  {household.notes && (
+                    <div className="flex items-start gap-3 text-gray-700">
+                      <ClipboardDocumentListIcon className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                      <span>{household.notes}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {household.members.length > 0 && (
                 <>
-                  <button onClick={() => toggleRow(household.id)} className="w-full border-t border-gray-200 px-4 py-3 text-sm font-medium text-indigo-600 hover:bg-gray-50 flex justify-between items-center transition-colors">
-                    <span>{expandedRows.has(household.id) ? 'Ẩn chi tiết thành viên' : `Xem ${household.members.length} thành viên`}</span>
-                    {expandedRows.has(household.id) ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                  <button onClick={() => toggleRow(household.id)} className="w-full border-t border-gray-200 px-5 py-3 text-sm font-medium text-blue-600 bg-blue-50/50 hover:bg-blue-100/70 flex justify-between items-center transition-colors">
+                    <span>{expandedRows.has(household.id) ? 'Ẩn chi tiết' : `Xem chi tiết thành viên`}</span>
+                    {expandedRows.has(household.id) ? <ChevronUpIcon className="w-5 h-5" /> : <ChevronDownIcon className="w-5 h-5" />}
                   </button>
                   {expandedRows.has(household.id) && (
                     <div className="p-4 bg-gray-50 border-t border-gray-200">
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {household.members.map(member => (
-                          <div key={member.id} className="text-sm p-3 bg-white rounded-md border">
-                             <div className="flex justify-between items-center">
+                          <div key={member.id} className="text-sm p-3 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
+                            <div>
                                 <p className="text-gray-800 font-semibold">{member.name}</p>
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${genderCellStyle(member.gender)}`}>
-                                    {member.gender || 'N/A'}
-                                </span>
-                             </div>
-                            <p className="text-gray-600 text-xs mt-1">Ngày sinh: {member.dob || 'N/A'}</p>
+                                <p className="text-gray-500 text-xs mt-1">Ngày sinh: {member.dob || 'N/A'}</p>
+                            </div>
+                            <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${genderCellStyle(member.gender)}`}>
+                                {member.gender || 'N/A'}
+                            </span>
                           </div>
                         ))}
                       </div>
