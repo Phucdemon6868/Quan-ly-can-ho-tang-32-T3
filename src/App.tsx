@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Household, Relationship } from './types';
 import HouseholdTable from './components/HouseholdTable';
 import HouseholdFormModal from './components/HouseholdFormModal';
@@ -8,10 +8,9 @@ import SearchIcon from './components/icons/SearchIcon';
 import ArrowDownTrayIcon from './components/icons/ArrowDownTrayIcon';
 import Dashboard from './components/Dashboard';
 import { Gender } from './types';
-import TableCellsIcon from './components/icons/TableCellsIcon';
-import ChartPieIcon from './components/icons/ChartPieIcon';
 import LogoIcon from './components/icons/LogoIcon';
 import Bars3Icon from './components/icons/Bars3Icon';
+import Sidebar from './components/Sidebar';
 
 
 const INITIAL_HOUSEHOLDS: Household[] = [
@@ -59,12 +58,11 @@ const App: React.FC = () => {
 
   const [activeView, setActiveView] = useState<ActiveView>('list');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editingHousehold, setEditingHousehold] = useState<Household | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: SortableKey; direction: SortDirection }>({ key: 'stt', direction: 'asc' });
   const [householdToDeleteId, setHouseholdToDeleteId] = useState<string | null>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try {
@@ -74,17 +72,6 @@ const App: React.FC = () => {
     }
   }, [households]);
   
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-
   const handleOpenAddModal = () => {
     setEditingHousehold(null);
     setIsModalOpen(true);
@@ -231,41 +218,28 @@ const App: React.FC = () => {
   
   const handleViewChange = (view: ActiveView) => {
     setActiveView(view);
-    setIsMenuOpen(false);
+    setIsSidebarOpen(false);
   }
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
-      <header className="fixed top-0 inset-x-0 bg-white/80 backdrop-blur-sm shadow-sm z-40">
+       <Sidebar 
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          activeView={activeView}
+          onViewChange={handleViewChange}
+        />
+
+      <header className="fixed top-0 inset-x-0 bg-white/80 backdrop-blur-sm shadow-sm z-30">
         <div className="container mx-auto flex justify-between items-center h-16 px-4">
-          <div className="relative" ref={menuRef}>
+          <div>
             <button
-              onClick={() => setIsMenuOpen(prev => !prev)}
+              onClick={() => setIsSidebarOpen(true)}
               className="p-2 rounded-full text-gray-600 hover:bg-gray-200 hover:text-gray-800 transition-colors"
               aria-label="Mở menu"
             >
               <Bars3Icon className="w-6 h-6" />
             </button>
-            {isMenuOpen && (
-              <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-2 animate-fade-in-down">
-                <a
-                  href="#"
-                  onClick={(e) => { e.preventDefault(); handleViewChange('list'); }}
-                  className={`flex items-center gap-3 px-4 py-2 text-sm ${activeView === 'list' ? 'font-semibold text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-100'}`}
-                >
-                  <TableCellsIcon className="w-5 h-5" />
-                  <span>Danh sách hộ gia đình</span>
-                </a>
-                <a
-                  href="#"
-                  onClick={(e) => { e.preventDefault(); handleViewChange('dashboard'); }}
-                  className={`flex items-center gap-3 px-4 py-2 text-sm ${activeView === 'dashboard' ? 'font-semibold text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-100'}`}
-                >
-                  <ChartPieIcon className="w-5 h-5" />
-                  <span>Bảng thống kê</span>
-                </a>
-              </div>
-            )}
           </div>
 
           <div className="absolute left-1/2 -translate-x-1/2">
