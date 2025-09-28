@@ -10,19 +10,31 @@ import Dashboard from './components/Dashboard';
 import { Gender } from './types';
 import TableCellsIcon from './components/icons/TableCellsIcon';
 import ChartPieIcon from './components/icons/ChartPieIcon';
+import LogoIcon from './components/icons/LogoIcon';
 
 
 const INITIAL_HOUSEHOLDS: Household[] = [
   {
     id: 'household_1',
     stt: 1,
-    apartmentNumber: '3202',
+    apartmentNumber: '32T3',
     headOfHouseholdName: 'Phan Trọng Phúc',
     phone: '0982243173',
-    notes: '1 con gái',
+    notes: 'Unity and Love',
     members: [
       { id: 'member_1_2', name: 'Lê Thị Mai Hương', dob: '1992-05-10', gender: Gender.Female, relationship: Relationship.Wife },
       { id: 'member_1_3', name: 'Phan Minh Anh', dob: '2021-06-03', gender: Gender.Female, relationship: Relationship.Child },
+    ],
+  },
+   {
+    id: 'household_2',
+    stt: 2,
+    apartmentNumber: '3203',
+    headOfHouseholdName: 'Nguyễn Văn A',
+    phone: '0123456789',
+    notes: '',
+    members: [
+      { id: 'member_2_1', name: 'Trần Thị B', dob: '1995-01-15', gender: Gender.Female, relationship: Relationship.Wife },
     ],
   },
 ];
@@ -227,10 +239,8 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-gray-50 text-gray-800">
       <main className="pb-24">
         <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-          <header className="mb-6 text-center">
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-              Quản lý Hộ gia đình
-            </h1>
+          <header className="mb-6 flex justify-center">
+             <LogoIcon className="h-24 w-auto" />
           </header>
           
           {activeView === 'list' && (
