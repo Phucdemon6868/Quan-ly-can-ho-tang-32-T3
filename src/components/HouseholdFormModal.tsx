@@ -73,13 +73,13 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-        <div className="p-6 border-b">
-          <h2 className="text-2xl font-bold text-gray-800">
+        <div className="p-4 md:p-6 border-b">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-800">
             {householdToEdit ? 'Chỉnh sửa thông tin hộ gia đình' : 'Thêm hộ gia đình mới'}
           </h2>
         </div>
         <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto">
-          <div className="p-6 space-y-6">
+          <div className="p-4 md:p-6 space-y-6">
             <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin chung</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -134,7 +134,7 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
               </button>
             </div>
           </div>
-          <div className="p-6 bg-gray-50 border-t flex justify-end gap-3">
+          <div className="p-4 md:p-6 bg-gray-50 border-t flex justify-end gap-3">
             <button type="button" onClick={onClose} className="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">Hủy</button>
             <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700">Lưu</button>
           </div>

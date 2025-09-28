@@ -199,7 +199,7 @@ const App: React.FC = () => {
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
       <header className="mb-8">
-        <h1 className="text-4xl font-bold text-center text-gray-800 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center text-gray-800 tracking-tight">
           Quản lý Hộ gia đình
         </h1>
         <p className="text-center text-gray-500 mt-2">
@@ -216,10 +216,10 @@ const App: React.FC = () => {
               </span>
               <input
                 type="text"
-                placeholder="Tìm kiếm chủ hộ, căn hộ, SĐT..."
+                placeholder="Tìm kiếm..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full sm:w-80 pl-10 pr-4 py-2.5 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 ${
+                className={`w-full sm:w-60 md:w-80 pl-10 pr-4 py-2.5 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 ${
                   searchTerm ? 'border-indigo-300 bg-indigo-50' : 'border-gray-300'
                 }`}
                 aria-label="Tìm kiếm hộ gia đình"
@@ -229,7 +229,7 @@ const App: React.FC = () => {
               <select
                   value={genderFilter}
                   onChange={(e) => setGenderFilter(e.target.value as Gender | 'All')}
-                  className={`w-full sm:w-48 px-4 py-2.5 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 ${
+                  className={`w-full sm:w-48 px-4 py-2.5 border rounded-lg shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 ${
                     genderFilter !== 'All' ? 'border-indigo-300 bg-indigo-50' : 'border-gray-300'
                   }`}
                   aria-label="Lọc theo giới tính"
@@ -243,18 +243,19 @@ const App: React.FC = () => {
           <div className="flex w-full sm:w-auto justify-center items-center gap-3">
             <button
               onClick={handleExportCSV}
-              className="flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-transform transform hover:scale-105"
+              className="flex w-full sm:w-auto justify-center items-center gap-2 p-3 sm:px-5 sm:py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-transform transform hover:scale-105"
               title="Xuất ra file CSV"
             >
               <ArrowDownTrayIcon />
-              Xuất File
+              <span className="hidden sm:inline">Xuất File</span>
             </button>
             <button
               onClick={handleOpenAddModal}
-              className="flex w-full sm:w-auto justify-center items-center gap-2 px-5 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105"
+              className="flex w-full sm:w-auto justify-center items-center gap-2 p-3 sm:px-5 sm:py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105"
+              title="Thêm hộ gia đình mới"
             >
               <PlusIcon className="w-5 h-5" />
-              Thêm Hộ
+              <span className="hidden sm:inline">Thêm Hộ</span>
             </button>
           </div>
         </div>
