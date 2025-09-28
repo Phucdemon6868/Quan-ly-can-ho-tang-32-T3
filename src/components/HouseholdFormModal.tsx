@@ -23,6 +23,7 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
     notes: '',
     members: []
   });
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
   useEffect(() => {
     if (householdToEdit) {
@@ -120,7 +121,15 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
                       </div>
                       <div>
                           <label className="block text-xs font-medium text-gray-600">Ngày sinh</label>
-                          <input type="date" value={member.dob} onChange={(e) => handleMemberChange(member.id, 'dob', e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm" />
+                          <input
+                            type={focusedInput === member.id || member.dob ? 'date' : 'text'}
+                            onFocus={() => setFocusedInput(member.id)}
+                            onBlur={() => setFocusedInput(null)}
+                            value={member.dob}
+                            onChange={(e) => handleMemberChange(member.id, 'dob', e.target.value)}
+                            placeholder="Chọn hoặc nhập ngày"
+                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm"
+                          />
                       </div>
                       <div>
                           <label className="block text-xs font-medium text-gray-600">Quan hệ với chủ hộ</label>
