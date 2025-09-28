@@ -9,7 +9,7 @@ import ArrowDownTrayIcon from './components/icons/ArrowDownTrayIcon';
 import Dashboard from './components/Dashboard';
 import { Gender } from './types';
 import Bars3Icon from './components/icons/Bars3Icon';
-import PencilSquareIcon from './components/icons/PencilSquareIcon';
+import ChartBarIcon from './components/icons/ChartBarIcon';
 
 
 const INITIAL_HOUSEHOLDS: Household[] = [
@@ -203,34 +203,55 @@ const App: React.FC = () => {
 
   const hasActiveFilters = searchTerm !== '';
   
-  const SidebarButton: React.FC<{
+  const NavButton: React.FC<{
     view: ActiveView;
     icon: React.ReactNode;
     label: string;
-  }> = ({ view, icon, label }) => (
-    <button
-      onClick={() => setActiveView(view)}
-      className={`p-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-        activeView === view
-          ? 'bg-blue-100 text-blue-600'
-          : 'text-gray-500 hover:bg-gray-100'
-      }`}
-      aria-label={label}
-      title={label}
-    >
-      {icon}
-    </button>
-  );
+    isSidebar?: boolean;
+  }> = ({ view, icon, label, isSidebar = false }) => {
+    const isActive = activeView === view;
+    const baseClasses = "transition-colors focus:outline-none";
+    
+    if (isSidebar) {
+      return (
+        <button
+          onClick={() => setActiveView(view)}
+          className={`${baseClasses} p-3 rounded-lg focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+            isActive ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-100'
+          }`}
+          aria-label={label}
+          title={label}
+        >
+          {icon}
+        </button>
+      );
+    }
+
+    return (
+       <button
+        onClick={() => setActiveView(view)}
+        className={`${baseClasses} flex flex-col items-center justify-center w-full pt-2 pb-1 rounded-md`}
+        aria-label={label}
+      >
+        <div className={`p-1 rounded-full ${isActive ? 'text-blue-600' : 'text-gray-500'}`}>
+           {icon}
+        </div>
+        <span className={`text-xs mt-1 font-medium ${isActive ? 'text-blue-600' : 'text-gray-500'}`}>{label}</span>
+      </button>
+    );
+  };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <nav className="w-20 bg-white shadow-md p-4 flex flex-col items-center gap-6 pt-8">
-        <SidebarButton view="list" icon={<Bars3Icon className="w-7 h-7" />} label="Danh sách" />
-        <SidebarButton view="dashboard" icon={<PencilSquareIcon className="w-7 h-7" />} label="Thống kê" />
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
+      {/* Sidebar for Desktop */}
+      <nav className="hidden md:flex w-20 bg-white shadow-md p-4 flex-col items-center gap-6 pt-8">
+        <NavButton view="list" icon={<Bars3Icon className="w-7 h-7" />} label="Danh sách" isSidebar />
+        <NavButton view="dashboard" icon={<ChartBarIcon className="w-7 h-7" />} label="Thống kê" isSidebar />
       </nav>
 
-      <main className="flex-1">
-        <div className="container mx-auto p-4 sm:p-6 lg:p-8 pb-24">
+      {/* Main Content */}
+      <main className="flex-1 pb-20 md:pb-0">
+        <div className="container mx-auto p-4 sm:p-6 lg:p-8">
           <header className="mb-6 text-center">
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
               Quản lý Hộ gia đình
@@ -281,6 +302,12 @@ const App: React.FC = () => {
         </div>
       </main>
 
+      {/* Bottom Navigation for Mobile */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white shadow-[0_-2px_5px_rgba(0,0,0,0.08)] flex justify-around items-center z-40">
+        <NavButton view="list" icon={<Bars3Icon className="w-6 h-6" />} label="Danh sách" />
+        <NavButton view="dashboard" icon={<ChartBarIcon className="w-6 h-6" />} label="Thống kê" />
+      </nav>
+
       <HouseholdFormModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -299,7 +326,7 @@ const App: React.FC = () => {
       {activeView === 'list' && (
         <button
           onClick={handleOpenAddModal}
-          className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-110 z-30"
+          className="fixed bottom-20 md:bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-110 z-30"
           title="Thêm hộ gia đình mới"
           aria-label="Thêm hộ gia đình mới"
         >
