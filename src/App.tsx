@@ -7,9 +7,9 @@ import PlusIcon from './components/icons/PlusIcon';
 import SearchIcon from './components/icons/SearchIcon';
 import ArrowDownTrayIcon from './components/icons/ArrowDownTrayIcon';
 import Dashboard from './components/Dashboard';
-import ListBulletIcon from './components/icons/ListBulletIcon';
-import ChartBarIcon from './components/icons/ChartBarIcon';
 import { Gender } from './types';
+import Bars3Icon from './components/icons/Bars3Icon';
+import PencilSquareIcon from './components/icons/PencilSquareIcon';
 
 
 const INITIAL_HOUSEHOLDS: Household[] = [
@@ -203,39 +203,40 @@ const App: React.FC = () => {
 
   const hasActiveFilters = searchTerm !== '';
   
-  const TabButton: React.FC<{
-    label: string;
+  const SidebarButton: React.FC<{
     view: ActiveView;
     icon: React.ReactNode;
-  }> = ({ label, view, icon }) => (
+    label: string;
+  }> = ({ view, icon, label }) => (
     <button
       onClick={() => setActiveView(view)}
-      className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-t-lg transition-colors focus:outline-none ${
+      className={`p-3 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
         activeView === view
-          ? 'border-b-2 border-blue-600 text-blue-600'
-          : 'text-gray-500 hover:text-gray-800'
+          ? 'bg-blue-100 text-blue-600'
+          : 'text-gray-500 hover:bg-gray-100'
       }`}
+      aria-label={label}
+      title={label}
     >
       {icon}
-      {label}
     </button>
   );
 
   return (
-    <div className="relative min-h-screen bg-gray-50">
-      <div className="container mx-auto p-4 sm:p-6 lg:p-8 pb-24">
-        <header className="mb-6 text-center">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-            Quản lý Hộ gia đình
-          </h1>
-        </header>
-        
-        <main>
-          <div className="flex border-b border-gray-200 mb-6">
-            <TabButton label="Danh sách" view="list" icon={<ListBulletIcon className="w-5 h-5"/>} />
-            <TabButton label="Thống kê" view="dashboard" icon={<ChartBarIcon className="w-5 h-5"/>} />
-          </div>
+    <div className="flex min-h-screen bg-gray-50">
+      <nav className="w-20 bg-white shadow-md p-4 flex flex-col items-center gap-6 pt-8">
+        <SidebarButton view="list" icon={<Bars3Icon className="w-7 h-7" />} label="Danh sách" />
+        <SidebarButton view="dashboard" icon={<PencilSquareIcon className="w-7 h-7" />} label="Thống kê" />
+      </nav>
 
+      <main className="flex-1">
+        <div className="container mx-auto p-4 sm:p-6 lg:p-8 pb-24">
+          <header className="mb-6 text-center">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+              Quản lý Hộ gia đình
+            </h1>
+          </header>
+          
           {activeView === 'list' && (
             <>
               <div className="mb-6 flex flex-row items-center gap-4">
@@ -277,23 +278,23 @@ const App: React.FC = () => {
           )}
 
           {activeView === 'dashboard' && <Dashboard households={households} />}
-        </main>
+        </div>
+      </main>
 
-        <HouseholdFormModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          onSave={handleSaveHousehold}
-          householdToEdit={editingHousehold}
-        />
+      <HouseholdFormModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSave={handleSaveHousehold}
+        householdToEdit={editingHousehold}
+      />
 
-        <ConfirmationModal
-          isOpen={!!householdToDeleteId}
-          onClose={handleCancelDelete}
-          onConfirm={handleConfirmDelete}
-          title="Xác nhận xóa"
-          message="Bạn có chắc chắn muốn xóa hộ gia đình này không? Hành động này không thể được hoàn tác."
-        />
-      </div>
+      <ConfirmationModal
+        isOpen={!!householdToDeleteId}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Xác nhận xóa"
+        message="Bạn có chắc chắn muốn xóa hộ gia đình này không? Hành động này không thể được hoàn tác."
+      />
 
       {activeView === 'list' && (
         <button
