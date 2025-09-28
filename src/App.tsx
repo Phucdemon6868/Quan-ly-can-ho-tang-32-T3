@@ -6,6 +6,7 @@ import ConfirmationModal from './components/ConfirmationModal';
 import PlusIcon from './components/icons/PlusIcon';
 import SearchIcon from './components/icons/SearchIcon';
 import ArrowDownTrayIcon from './components/icons/ArrowDownTrayIcon';
+import ChevronDownIcon from './components/icons/ChevronDownIcon';
 
 const INITIAL_HOUSEHOLDS: Household[] = [
   {
@@ -199,19 +200,16 @@ const App: React.FC = () => {
   return (
     <div className="relative min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 sm:p-6 lg:p-8 pb-24">
-        <header className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-center text-gray-800 tracking-tight">
+        <header className="mb-6 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 tracking-tight">
             Quản lý Hộ gia đình
           </h1>
-          <p className="text-center text-gray-500 mt-2">
-            Danh sách và quản lý thông tin các hộ gia đình.
-          </p>
         </header>
         
         <main>
-          <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-            <div className="flex flex-col sm:flex-row w-full md:w-auto gap-4">
-              <div className="relative w-full sm:w-auto">
+          <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="relative w-full md:flex-grow">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   <SearchIcon className="w-5 h-5 text-gray-400" />
                 </span>
@@ -220,36 +218,39 @@ const App: React.FC = () => {
                   placeholder="Tìm kiếm chủ hộ, căn hộ..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`w-full sm:w-60 md:w-80 pl-10 pr-4 py-2.5 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                    searchTerm ? 'border-blue-300 bg-blue-50' : 'border-gray-300'
-                  }`}
+                  className="w-full pl-10 pr-4 py-2.5 text-gray-700 bg-gray-100 rounded-lg border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
                   aria-label="Tìm kiếm hộ gia đình"
                 />
               </div>
-              <div className="relative w-full sm:w-auto">
-                <select
-                    value={genderFilter}
-                    onChange={(e) => setGenderFilter(e.target.value as Gender | 'All')}
-                    className={`w-full sm:w-48 px-4 py-2.5 border rounded-lg shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                      genderFilter !== 'All' ? 'border-blue-300 bg-blue-50' : 'border-gray-300'
-                    }`}
-                    aria-label="Lọc theo giới tính"
-                >
-                    <option value="All">Tất cả giới tính</option>
-                    <option value={Gender.Male}>Nam</option>
-                    <option value={Gender.Female}>Nữ</option>
-                </select>
+              
+              <div className="flex items-center gap-4">
+                <div className="relative w-full sm:w-auto flex-shrink-0">
+                  <select
+                      value={genderFilter}
+                      onChange={(e) => setGenderFilter(e.target.value as Gender | 'All')}
+                      className="w-full sm:w-48 pl-4 pr-10 py-2.5 text-gray-700 bg-gray-100 rounded-lg border-transparent appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                      aria-label="Lọc theo giới tính"
+                  >
+                      <option value="All">Tất cả giới tính</option>
+                      <option value={Gender.Male}>Nam</option>
+                      <option value={Gender.Female}>Nữ</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                    <ChevronDownIcon className="w-5 h-5 text-gray-400"/>
+                  </div>
+                </div>
+
+                <div className="hidden md:block">
+                  <button
+                    onClick={handleExportCSV}
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-green-50 text-green-700 font-semibold rounded-lg hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition"
+                    title="Xuất ra file CSV"
+                  >
+                    <ArrowDownTrayIcon className="w-5 h-5" />
+                    <span>Xuất File</span>
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="hidden md:flex w-full md:w-auto justify-end items-center">
-              <button
-                onClick={handleExportCSV}
-                className="flex w-full sm:w-auto justify-center items-center gap-2 px-4 py-2.5 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-transform transform hover:scale-105"
-                title="Xuất ra file CSV"
-              >
-                <ArrowDownTrayIcon />
-                <span className="hidden sm:inline">Xuất File</span>
-              </button>
             </div>
           </div>
           
