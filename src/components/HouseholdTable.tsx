@@ -92,11 +92,13 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
             {households.length === 0 ? (
               <tr><td colSpan={numberOfColumns} className="px-6 py-12 text-center text-gray-500">{getEmptyStateMessage()}</td></tr>
             ) : (
-              households.map((household) => (
+              households.map((household) => {
+                const membersToDisplay = household.members.filter(member => member.name !== household.headOfHouseholdName);
+                return (
                 <React.Fragment key={household.id}>
                   <tr className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="px-2 py-4 text-center">
-                      {household.members.length > 0 && (
+                      {membersToDisplay.length > 0 && (
                         <button onClick={() => toggleRow(household.id)} className="p-1 rounded-full hover:bg-gray-200 transition-colors">
                           {expandedRows.has(household.id) ? <ChevronUpIcon /> : <ChevronDownIcon />}
                         </button>
@@ -106,7 +108,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                     <td className="px-6 py-4 align-middle text-red-600 font-semibold">{household.headOfHouseholdName}</td>
                     <td className="px-6 py-4 align-middle">{household.apartmentNumber}</td>
                     <td className="px-6 py-4 align-middle">
-                      <span className="px-2.5 py-1 text-sm font-semibold rounded-full bg-gray-200 text-gray-700">{household.members.length}</span>
+                      <span className="px-2.5 py-1 text-sm font-semibold rounded-full bg-gray-200 text-gray-700">{membersToDisplay.length}</span>
                     </td>
                     <td className="px-6 py-4 align-middle">{household.phone}</td>
                     <td className="px-6 py-4 align-middle">{household.notes}</td>
@@ -117,7 +119,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                       </div>
                     </td>
                   </tr>
-                  {expandedRows.has(household.id) && household.members.length > 0 && (
+                  {expandedRows.has(household.id) && membersToDisplay.length > 0 && (
                     <tr className="bg-gray-50"><td colSpan={numberOfColumns} className="p-0">
                       <div className="p-4">
                         <h4 className="text-md font-semibold text-gray-700 mb-3 ml-2">Chi tiết thành viên</h4>
@@ -130,7 +132,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
-                          {household.members.map(member => (
+                          {membersToDisplay.map(member => (
                             <tr key={member.id}>
                               <td className="px-6 py-3 whitespace-nowrap">{member.name}</td>
                               <td className="px-6 py-3 whitespace-nowrap">{member.relationship || 'N/A'}</td>
@@ -143,7 +145,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                     </td></tr>
                   )}
                 </React.Fragment>
-              ))
+              )})
             )}
           </tbody>
         </table>
@@ -156,7 +158,9 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
             {getEmptyStateMessage()}
           </div>
         ) : (
-          households.map((household) => (
+          households.map((household) => {
+            const membersToDisplay = household.members.filter(member => member.name !== household.headOfHouseholdName);
+            return (
             <div key={household.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-shadow duration-300 hover:shadow-lg">
               <div className="p-5">
                 <div className="flex justify-between items-start">
@@ -179,7 +183,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                 <div className="mt-4 pt-4 border-t border-gray-200 space-y-3 text-sm">
                   <div className="flex items-center gap-3 text-gray-700">
                     <UsersIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                    <span>{household.members.length} thành viên</span>
+                    <span>{membersToDisplay.length} thành viên</span>
                   </div>
                   <div className="flex items-center gap-3 text-gray-700">
                     <PhoneIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
@@ -194,7 +198,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                 </div>
               </div>
 
-              {household.members.length > 0 && (
+              {membersToDisplay.length > 0 && (
                 <>
                   <button onClick={() => toggleRow(household.id)} className="w-full border-t border-gray-200 px-5 py-3 text-sm font-medium text-blue-600 bg-blue-50/50 hover:bg-blue-100/70 flex justify-between items-center transition-colors">
                     <span>{expandedRows.has(household.id) ? 'Ẩn chi tiết' : `Xem chi tiết thành viên`}</span>
@@ -203,7 +207,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                   {expandedRows.has(household.id) && (
                     <div className="p-4 bg-gray-50 border-t border-gray-200">
                       <div className="space-y-3">
-                        {household.members.map(member => (
+                        {membersToDisplay.map(member => (
                           <div key={member.id} className="text-sm p-3 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
                             <div>
                                 <p className="text-gray-800 font-semibold">{member.name} <span className="text-gray-500 font-normal">({member.relationship || 'Chưa rõ'})</span></p>
@@ -220,7 +224,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                 </>
               )}
             </div>
-          ))
+          )})
         )}
       </div>
     </>
