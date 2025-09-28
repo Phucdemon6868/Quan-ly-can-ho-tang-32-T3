@@ -1,5 +1,7 @@
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { db } from './firebase';
 import { Household, Gender } from './types';
 import HouseholdTable from './components/HouseholdTable';
 import HouseholdFormModal from './components/HouseholdFormModal';
@@ -8,33 +10,40 @@ import PlusIcon from './components/icons/PlusIcon';
 import SearchIcon from './components/icons/SearchIcon';
 import ArrowDownTrayIcon from './components/icons/ArrowDownTrayIcon';
 
-const INITIAL_HOUSEHOLDS: Household[] = [
-  {
-    id: 'household_1',
-    stt: 1,
-    apartmentNumber: '3202',
-    headOfHouseholdName: 'Phan Trọng Phúc',
-    phone: '0982243173',
-    notes: '1 con gái',
-    members: [
-      { id: 'member_1_1', name: 'Phan Trọng Phúc', dob: '', gender: Gender.Male },
-      { id: 'member_1_2', name: 'Lê Thị Mai Hương', dob: '', gender: Gender.Female },
-      { id: 'member_1_3', name: 'Phan Minh Anh', dob: '03/06/2021', gender: Gender.Female },
-    ],
-  },
-];
-
 type SortableKey = 'stt' | 'headOfHouseholdName' | 'apartmentNumber' | 'phone';
 type SortDirection = 'asc' | 'desc';
 
 const App: React.FC = () => {
-  const [households, setHouseholds] = useState<Household[]>(INITIAL_HOUSEHOLDS);
+  const [households, setHouseholds] = useState<Household[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHousehold, setEditingHousehold] = useState<Household | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [genderFilter, setGenderFilter] = useState<Gender | 'All'>('All');
   const [sortConfig, setSortConfig] = useState<{ key: SortableKey; direction: SortDirection }>({ key: 'stt', direction: 'asc' });
   const [householdToDeleteId, setHouseholdToDeleteId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    const q = query(collection(db, "households"), orderBy("stt"));
+    const unsubscribe = onSnapshot(q, 
+      (querySnapshot) => {
+        const householdsData: Household[] = [];
+        querySnapshot.forEach((doc) => {
+          householdsData.push({ id: doc.id, ...doc.data() } as Household);
+        });
+        setHouseholds(householdsData);
+        setLoading(false);
+      }, 
+      (error) => {
+        console.error("Error fetching households: ", error);
+        setLoading(false);
+        // You might want to show an error message to the user here
+      }
+    );
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, []);
 
   const handleOpenAddModal = () => {
     setEditingHousehold(null);
@@ -51,27 +60,43 @@ const App: React.FC = () => {
     setEditingHousehold(null);
   };
 
-  const handleSaveHousehold = useCallback((householdToSave: Household) => {
-    setHouseholds(prev => {
-      const exists = prev.some(h => h.id === householdToSave.id);
-      if (exists) {
-        return prev.map(h => (h.id === householdToSave.id ? householdToSave : h));
-      } else {
-        const maxStt = prev.length > 0 ? Math.max(...prev.map(h => h.stt)) : 0;
-        const newHousehold = { ...householdToSave, stt: maxStt + 1 };
-        return [...prev, newHousehold];
+  const handleSaveHousehold = useCallback(async (householdToSave: Household) => {
+    // Check if it's an existing household by seeing if the ID is a Firestore ID (not a temp one)
+    const isEditing = households.some(h => h.id === householdToSave.id);
+
+    if (isEditing) {
+      try {
+        const docRef = doc(db, 'households', householdToSave.id);
+        const { id, ...dataToUpdate } = householdToSave;
+        await updateDoc(docRef, dataToUpdate);
+      } catch (error) {
+        console.error("Error updating document: ", error);
       }
-    });
-  }, []);
+    } else {
+      try {
+        const maxStt = households.length > 0 ? Math.max(...households.map(h => h.stt)) : 0;
+        const newHouseholdData = { ...householdToSave, stt: maxStt + 1 };
+        // Firestore generates the ID, so we remove our temporary client-side ID.
+        const { id, ...dataToAdd } = newHouseholdData;
+        await addDoc(collection(db, 'households'), dataToAdd);
+      } catch (error) {
+        console.error("Error adding document: ", error);
+      }
+    }
+  }, [households]);
 
   const handleRequestDelete = useCallback((householdId: string) => {
     setHouseholdToDeleteId(householdId);
   }, []);
 
-  const handleConfirmDelete = useCallback(() => {
+  const handleConfirmDelete = useCallback(async () => {
     if (householdToDeleteId) {
-      setHouseholds(prev => prev.filter(h => h.id !== householdToDeleteId));
-      setHouseholdToDeleteId(null);
+      try {
+        await deleteDoc(doc(db, 'households', householdToDeleteId));
+        setHouseholdToDeleteId(null);
+      } catch (error) {
+        console.error("Error deleting document: ", error);
+      }
     }
   }, [householdToDeleteId]);
 
@@ -101,13 +126,8 @@ const App: React.FC = () => {
           )
         );
     }
-    
-    if (genderFilter !== 'All') {
-        results = results.filter(household =>
-            household.members.some(member => member.gender === genderFilter)
-        );
-    }
 
+    // Client-side sorting is still applied after fetching
     results.sort((a, b) => {
       const aVal = a[sortConfig.key];
       const bVal = b[sortConfig.key];
@@ -124,7 +144,7 @@ const App: React.FC = () => {
     });
 
     return results;
-  }, [households, searchTerm, genderFilter, sortConfig]);
+  }, [households, searchTerm, sortConfig]);
 
   const handleExportCSV = () => {
     const headers = ['STT', 'Số căn', 'Chủ hộ', 'SĐT', 'Ghi chú', 'Tên thành viên', 'Ngày sinh', 'Giới tính'];
@@ -176,7 +196,15 @@ const App: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  const hasActiveFilters = searchTerm !== '' || genderFilter !== 'All';
+  const hasActiveFilters = searchTerm !== '';
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-xl font-semibold text-gray-500">Đang tải dữ liệu...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
@@ -191,8 +219,8 @@ const App: React.FC = () => {
       
       <main>
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-          <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-4">
-            <div className="relative w-full sm:w-auto">
+          <div className="flex w-full sm:w-auto">
+            <div className="relative w-full">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                 <SearchIcon className="w-5 h-5 text-gray-400" />
               </span>
@@ -206,20 +234,6 @@ const App: React.FC = () => {
                 }`}
                 aria-label="Tìm kiếm hộ gia đình"
               />
-            </div>
-            <div className="relative w-full sm:w-auto">
-              <select
-                  value={genderFilter}
-                  onChange={(e) => setGenderFilter(e.target.value as Gender | 'All')}
-                  className={`w-full sm:w-48 px-4 py-2.5 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 ${
-                    genderFilter !== 'All' ? 'border-indigo-300 bg-indigo-50' : 'border-gray-300'
-                  }`}
-                  aria-label="Lọc theo giới tính"
-              >
-                  <option value="All">Tất cả giới tính</option>
-                  <option value={Gender.Male}>Nam</option>
-                  <option value={Gender.Female}>Nữ</option>
-              </select>
             </div>
           </div>
           <div className="flex w-full sm:w-auto justify-center items-center gap-3">
