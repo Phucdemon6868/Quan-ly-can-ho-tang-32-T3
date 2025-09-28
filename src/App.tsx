@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Household, Relationship } from './types';
 import HouseholdTable from './components/HouseholdTable';
 import HouseholdFormModal from './components/HouseholdFormModal';
@@ -11,6 +11,7 @@ import { Gender } from './types';
 import TableCellsIcon from './components/icons/TableCellsIcon';
 import ChartPieIcon from './components/icons/ChartPieIcon';
 import LogoIcon from './components/icons/LogoIcon';
+import Bars3Icon from './components/icons/Bars3Icon';
 
 
 const INITIAL_HOUSEHOLDS: Household[] = [
@@ -58,10 +59,12 @@ const App: React.FC = () => {
 
   const [activeView, setActiveView] = useState<ActiveView>('list');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [editingHousehold, setEditingHousehold] = useState<Household | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: SortableKey; direction: SortDirection }>({ key: 'stt', direction: 'asc' });
   const [householdToDeleteId, setHouseholdToDeleteId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try {
@@ -70,6 +73,17 @@ const App: React.FC = () => {
       console.error('Could not save households to localStorage', error);
     }
   }, [households]);
+  
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
 
   const handleOpenAddModal = () => {
     setEditingHousehold(null);
@@ -215,61 +229,89 @@ const App: React.FC = () => {
 
   const hasActiveFilters = searchTerm !== '';
   
-  const NavButton: React.FC<{
-    view: ActiveView;
-    icon: React.ReactNode;
-    label: string;
-  }> = ({ view, icon, label }) => {
-    const isActive = activeView === view;
-    return (
-       <button
-        onClick={() => setActiveView(view)}
-        className="flex flex-col items-center justify-center w-full pt-2 pb-1 transition-colors duration-200"
-        aria-label={label}
-      >
-        <div className={`p-1 rounded-full ${isActive ? 'text-blue-600' : 'text-gray-500'}`}>
-           {icon}
-        </div>
-        <span className={`text-xs mt-1 font-medium ${isActive ? 'text-blue-600' : 'text-gray-500'}`}>{label}</span>
-      </button>
-    );
-  };
+  const handleViewChange = (view: ActiveView) => {
+    setActiveView(view);
+    setIsMenuOpen(false);
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
-      <main className="pb-24">
+      <header className="fixed top-0 inset-x-0 bg-white/80 backdrop-blur-sm shadow-sm z-40">
+        <div className="container mx-auto flex justify-between items-center h-16 px-4">
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setIsMenuOpen(prev => !prev)}
+              className="p-2 rounded-full text-gray-600 hover:bg-gray-200 hover:text-gray-800 transition-colors"
+              aria-label="Mở menu"
+            >
+              <Bars3Icon className="w-6 h-6" />
+            </button>
+            {isMenuOpen && (
+              <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-2 animate-fade-in-down">
+                <a
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); handleViewChange('list'); }}
+                  className={`flex items-center gap-3 px-4 py-2 text-sm ${activeView === 'list' ? 'font-semibold text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-100'}`}
+                >
+                  <TableCellsIcon className="w-5 h-5" />
+                  <span>Danh sách hộ gia đình</span>
+                </a>
+                <a
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); handleViewChange('dashboard'); }}
+                  className={`flex items-center gap-3 px-4 py-2 text-sm ${activeView === 'dashboard' ? 'font-semibold text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-100'}`}
+                >
+                  <ChartPieIcon className="w-5 h-5" />
+                  <span>Bảng thống kê</span>
+                </a>
+              </div>
+            )}
+          </div>
+
+          <div className="absolute left-1/2 -translate-x-1/2">
+            <LogoIcon className="h-20 w-auto" />
+          </div>
+
+          <div>
+             <button
+              onClick={handleOpenAddModal}
+              className="p-2 rounded-full text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition-colors"
+              title="Thêm hộ gia đình mới"
+              aria-label="Thêm hộ gia đình mới"
+            >
+              <PlusIcon className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="pt-16">
         <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-          <header className="mb-6 flex justify-center">
-             <LogoIcon className="h-24 w-auto" />
-          </header>
-          
           {activeView === 'list' && (
             <>
-              <div className="sticky top-0 bg-gray-50/80 backdrop-blur-sm z-10 py-4 -mx-4 px-4 mb-4 border-b border-gray-200">
-                <div className="container mx-auto flex items-center gap-2 sm:gap-4">
-                  <div className="relative flex-grow">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                      <SearchIcon className="w-5 h-5 text-gray-400" />
-                    </span>
-                    <input
-                      type="text"
-                      placeholder="Tìm kiếm..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 text-gray-700 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                      aria-label="Tìm kiếm hộ gia đình"
-                    />
-                  </div>
-                  
-                  <div className="flex-shrink-0">
-                      <button
-                        onClick={handleExportCSV}
-                        className="flex items-center justify-center p-2.5 bg-white text-gray-600 border border-gray-200 font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
-                        title="Xuất ra file CSV"
-                      >
-                        <ArrowDownTrayIcon className="w-5 h-5" />
-                      </button>
-                  </div>
+              <div className="flex items-center gap-2 sm:gap-4 mb-6">
+                <div className="relative flex-grow">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <SearchIcon className="w-5 h-5 text-gray-400" />
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 text-gray-700 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    aria-label="Tìm kiếm hộ gia đình"
+                  />
+                </div>
+                
+                <div className="flex-shrink-0">
+                    <button
+                      onClick={handleExportCSV}
+                      className="flex items-center justify-center p-2.5 bg-white text-gray-600 border border-gray-200 font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+                      title="Xuất ra file CSV"
+                    >
+                      <ArrowDownTrayIcon className="w-5 h-5" />
+                    </button>
                 </div>
               </div>
               
@@ -287,30 +329,6 @@ const App: React.FC = () => {
           {activeView === 'dashboard' && <Dashboard households={households} />}
         </div>
       </main>
-
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 inset-x-0 bg-white/80 backdrop-blur-sm shadow-[0_-2px_5px_rgba(0,0,0,0.05)] flex justify-around items-center z-40 h-16">
-        <div className="w-1/3">
-           <NavButton view="list" icon={<TableCellsIcon className="w-6 h-6" />} label="Danh sách" />
-        </div>
-        
-        <div className="w-1/3 flex justify-center">
-          {activeView === 'list' && (
-            <button
-              onClick={handleOpenAddModal}
-              className="absolute -top-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-110"
-              title="Thêm hộ gia đình mới"
-              aria-label="Thêm hộ gia đình mới"
-            >
-              <PlusIcon className="w-7 h-7" />
-            </button>
-          )}
-        </div>
-
-        <div className="w-1/3">
-           <NavButton view="dashboard" icon={<ChartPieIcon className="w-6 h-6" />} label="Thống kê" />
-        </div>
-      </nav>
 
       <HouseholdFormModal
         isOpen={isModalOpen}
