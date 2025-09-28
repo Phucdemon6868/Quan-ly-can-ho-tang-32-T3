@@ -22,6 +22,12 @@ interface HouseholdTableProps {
   onSort: (key: SortableKey) => void;
 }
 
+const formatDateForDisplay = (dateStr: string) => {
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr || 'N/A';
+  const [year, month, day] = dateStr.split('-');
+  return `${day}/${month}/${year}`;
+};
+
 const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onDelete, hasActiveFilters, sortConfig, onSort }) => {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
@@ -136,7 +142,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                             <tr key={member.id}>
                               <td className="px-6 py-3 whitespace-nowrap">{member.name}</td>
                               <td className="px-6 py-3 whitespace-nowrap">{member.relationship || 'N/A'}</td>
-                              <td className="px-6 py-3 whitespace-nowrap">{member.dob}</td>
+                              <td className="px-6 py-3 whitespace-nowrap">{formatDateForDisplay(member.dob)}</td>
                               <td className="px-6 py-3 whitespace-nowrap"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${genderCellStyle(member.gender)}`}>{member.gender}</span></td>
                             </tr>
                           ))}
@@ -211,7 +217,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                           <div key={member.id} className="text-sm p-3 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
                             <div>
                                 <p className="text-gray-800 font-semibold">{member.name} <span className="text-gray-500 font-normal">({member.relationship || 'Chưa rõ'})</span></p>
-                                <p className="text-gray-500 text-xs mt-1">Ngày sinh: {member.dob || 'N/A'}</p>
+                                <p className="text-gray-500 text-xs mt-1">Ngày sinh: {formatDateForDisplay(member.dob)}</p>
                             </div>
                             <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${genderCellStyle(member.gender)}`}>
                                 {member.gender || 'N/A'}

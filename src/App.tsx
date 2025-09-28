@@ -1,15 +1,15 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { Household, Gender, Relationship } from './types';
+import { Household, Relationship } from './types';
 import HouseholdTable from './components/HouseholdTable';
 import HouseholdFormModal from './components/HouseholdFormModal';
 import ConfirmationModal from './components/ConfirmationModal';
 import PlusIcon from './components/icons/PlusIcon';
 import SearchIcon from './components/icons/SearchIcon';
 import ArrowDownTrayIcon from './components/icons/ArrowDownTrayIcon';
-import ChevronDownIcon from './components/icons/ChevronDownIcon';
 import Dashboard from './components/Dashboard';
 import ListBulletIcon from './components/icons/ListBulletIcon';
 import ChartBarIcon from './components/icons/ChartBarIcon';
+import { Gender } from './types';
 
 
 const INITIAL_HOUSEHOLDS: Household[] = [
@@ -21,9 +21,9 @@ const INITIAL_HOUSEHOLDS: Household[] = [
     phone: '0982243173',
     notes: '1 con gái',
     members: [
-      { id: 'member_1_1', name: 'Phan Trọng Phúc', dob: '', gender: Gender.Male, relationship: Relationship.None },
-      { id: 'member_1_2', name: 'Lê Thị Mai Hương', dob: '', gender: Gender.Female, relationship: Relationship.Wife },
-      { id: 'member_1_3', name: 'Phan Minh Anh', dob: '03/06/2021', gender: Gender.Female, relationship: Relationship.Child },
+      { id: 'member_1_1', name: 'Phan Trọng Phúc', dob: '1990-01-01', gender: Gender.Male, relationship: Relationship.None },
+      { id: 'member_1_2', name: 'Lê Thị Mai Hương', dob: '1992-05-10', gender: Gender.Female, relationship: Relationship.Wife },
+      { id: 'member_1_3', name: 'Phan Minh Anh', dob: '2021-06-03', gender: Gender.Female, relationship: Relationship.Child },
     ],
   },
 ];
@@ -49,7 +49,6 @@ const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHousehold, setEditingHousehold] = useState<Household | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [genderFilter, setGenderFilter] = useState<Gender | 'All'>('All');
   const [sortConfig, setSortConfig] = useState<{ key: SortableKey; direction: SortDirection }>({ key: 'stt', direction: 'asc' });
   const [householdToDeleteId, setHouseholdToDeleteId] = useState<string | null>(null);
 
@@ -126,12 +125,6 @@ const App: React.FC = () => {
           )
         );
     }
-    
-    if (genderFilter !== 'All') {
-        results = results.filter(household =>
-            household.members.some(member => member.gender === genderFilter)
-        );
-    }
 
     results.sort((a, b) => {
       const aVal = a[sortConfig.key];
@@ -149,7 +142,13 @@ const App: React.FC = () => {
     });
 
     return results;
-  }, [households, searchTerm, genderFilter, sortConfig]);
+  }, [households, searchTerm, sortConfig]);
+
+  const formatDateForExport = (dateStr: string) => {
+    if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr || '';
+    const [year, month, day] = dateStr.split('-');
+    return `${day}/${month}/${year}`;
+  };
 
   const handleExportCSV = () => {
     const headers = ['STT', 'Số căn', 'Chủ hộ', 'SĐT', 'Ghi chú', 'Tên thành viên', 'Ngày sinh', 'Giới tính', 'Quan hệ'];
@@ -173,7 +172,7 @@ const App: React.FC = () => {
         household.phone,
         household.notes,
         member.name,
-        member.dob,
+        formatDateForExport(member.dob),
         member.gender,
         member.relationship || ''
       ]);
@@ -203,7 +202,7 @@ const App: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  const hasActiveFilters = searchTerm !== '' || genderFilter !== 'All';
+  const hasActiveFilters = searchTerm !== '';
   
   const TabButton: React.FC<{
     label: string;
@@ -257,22 +256,6 @@ const App: React.FC = () => {
                   </div>
                   
                   <div className="flex items-center gap-4">
-                    <div className="relative w-full sm:w-auto flex-shrink-0">
-                      <select
-                          value={genderFilter}
-                          onChange={(e) => setGenderFilter(e.target.value as Gender | 'All')}
-                          className="w-full sm:w-48 pl-4 pr-10 py-2.5 text-gray-700 bg-gray-100 rounded-lg border-transparent appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
-                          aria-label="Lọc theo giới tính"
-                      >
-                          <option value="All">Tất cả giới tính</option>
-                          <option value={Gender.Male}>Nam</option>
-                          <option value={Gender.Female}>Nữ</option>
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                        <ChevronDownIcon className="w-5 h-5 text-gray-400"/>
-                      </div>
-                    </div>
-
                     <div className="hidden md:block">
                       <button
                         onClick={handleExportCSV}
