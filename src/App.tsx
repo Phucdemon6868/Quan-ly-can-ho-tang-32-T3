@@ -1,5 +1,6 @@
-
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { db } from './firebase';
 import { Household, Relationship, Gender } from './types';
 import HouseholdTable from './components/HouseholdTable';
 import HouseholdFormModal from './components/HouseholdFormModal';
@@ -13,53 +14,13 @@ import Bars3Icon from './components/icons/Bars3Icon';
 import Sidebar from './components/Sidebar';
 
 
-const INITIAL_HOUSEHOLDS: Household[] = [
-  {
-    id: 'household_1',
-    stt: 1,
-    apartmentNumber: '32T3',
-    headOfHouseholdName: 'Phan Trọng Phúc',
-    headOfHouseholdDob: '1990-01-01',
-    headOfHouseholdGender: Gender.Male,
-    phone: '0982243173',
-    notes: 'Unity and Love',
-    members: [
-      { id: 'member_1_2', name: 'Lê Thị Mai Hương', dob: '1992-05-10', gender: Gender.Female, relationship: Relationship.Wife, phone: '0987654321' },
-      { id: 'member_1_3', name: 'Phan Minh Anh', dob: '2021-06-03', gender: Gender.Female, relationship: Relationship.Child, phone: '' },
-    ],
-  },
-   {
-    id: 'household_2',
-    stt: 2,
-    apartmentNumber: '3203',
-    headOfHouseholdName: 'Nguyễn Văn A',
-    headOfHouseholdDob: '1985-02-20',
-    headOfHouseholdGender: Gender.Male,
-    phone: '0123456789',
-    notes: '',
-    members: [
-      { id: 'member_2_1', name: 'Trần Thị B', dob: '1995-01-15', gender: Gender.Female, relationship: Relationship.Wife, phone: '' },
-    ],
-  },
-];
-
 type SortableKey = 'stt' | 'headOfHouseholdName' | 'apartmentNumber' | 'phone';
 type SortDirection = 'asc' | 'desc';
 type ActiveView = 'list' | 'dashboard';
 
 const App: React.FC = () => {
-  const [households, setHouseholds] = useState<Household[]>(() => {
-    try {
-      const savedHouseholds = window.localStorage.getItem('households');
-      if (savedHouseholds) {
-        return JSON.parse(savedHouseholds);
-      }
-    } catch (error) {
-      console.error('Could not load households from localStorage', error);
-    }
-    return INITIAL_HOUSEHOLDS;
-  });
-
+  const [households, setHouseholds] = useState<Household[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeView, setActiveView] = useState<ActiveView>('list');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -69,12 +30,25 @@ const App: React.FC = () => {
   const [householdToDeleteId, setHouseholdToDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      window.localStorage.setItem('households', JSON.stringify(households));
-    } catch (error) {
-      console.error('Could not save households to localStorage', error);
-    }
-  }, [households]);
+    setLoading(true);
+    const q = query(collection(db, "households"), orderBy("stt"));
+    const unsubscribe = onSnapshot(q, 
+      (querySnapshot) => {
+        const householdsData: Household[] = [];
+        querySnapshot.forEach((doc) => {
+          householdsData.push({ id: doc.id, ...doc.data() } as Household);
+        });
+        setHouseholds(householdsData);
+        setLoading(false);
+      }, 
+      (error) => {
+        console.error("Error fetching households: ", error);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
   
   const handleOpenAddModal = () => {
     setEditingHousehold(null);
@@ -91,27 +65,41 @@ const App: React.FC = () => {
     setEditingHousehold(null);
   };
 
-  const handleSaveHousehold = useCallback((householdToSave: Household) => {
-    setHouseholds(prev => {
-      const exists = prev.some(h => h.id === householdToSave.id);
-      if (exists) {
-        return prev.map(h => (h.id === householdToSave.id ? householdToSave : h));
-      } else {
-        const maxStt = prev.length > 0 ? Math.max(...prev.map(h => h.stt)) : 0;
-        const newHousehold = { ...householdToSave, stt: maxStt + 1 };
-        return [...prev, newHousehold];
+  const handleSaveHousehold = useCallback(async (householdToSave: Household) => {
+    const isEditing = households.some(h => h.id === householdToSave.id);
+
+    if (isEditing) {
+      try {
+        const docRef = doc(db, 'households', householdToSave.id);
+        const { id, ...dataToUpdate } = householdToSave;
+        await updateDoc(docRef, dataToUpdate);
+      } catch (error) {
+        console.error("Error updating document: ", error);
       }
-    });
-  }, []);
+    } else {
+      try {
+        const maxStt = households.length > 0 ? Math.max(...households.map(h => h.stt)) : 0;
+        const newHouseholdData = { ...householdToSave, stt: maxStt + 1 };
+        const { id, ...dataToAdd } = newHouseholdData;
+        await addDoc(collection(db, 'households'), dataToAdd);
+      } catch (error) {
+        console.error("Error adding document: ", error);
+      }
+    }
+  }, [households]);
 
   const handleRequestDelete = useCallback((householdId: string) => {
     setHouseholdToDeleteId(householdId);
   }, []);
 
-  const handleConfirmDelete = useCallback(() => {
+  const handleConfirmDelete = useCallback(async () => {
     if (householdToDeleteId) {
-      setHouseholds(prev => prev.filter(h => h.id !== householdToDeleteId));
-      setHouseholdToDeleteId(null);
+       try {
+        await deleteDoc(doc(db, 'households', householdToDeleteId));
+        setHouseholdToDeleteId(null);
+      } catch (error) {
+        console.error("Error deleting document: ", error);
+      }
     }
   }, [householdToDeleteId]);
 
@@ -229,6 +217,14 @@ const App: React.FC = () => {
   const handleViewChange = (view: ActiveView) => {
     setActiveView(view);
     setIsSidebarOpen(false);
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-xl font-semibold text-gray-500">Đang tải dữ liệu...</div>
+      </div>
+    );
   }
 
   return (
