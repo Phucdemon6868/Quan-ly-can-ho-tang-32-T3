@@ -22,7 +22,7 @@ export interface Member {
   name: string;
   dob: string;
   gender: Gender;
-  relationship?: Relationship;
+  relationship: Relationship;
 }
 
 export interface Household {

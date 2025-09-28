@@ -21,7 +21,6 @@ const INITIAL_HOUSEHOLDS: Household[] = [
     phone: '0982243173',
     notes: '1 con gái',
     members: [
-      { id: 'member_1_1', name: 'Phan Trọng Phúc', dob: '1990-01-01', gender: Gender.Male, relationship: Relationship.None },
       { id: 'member_1_2', name: 'Lê Thị Mai Hương', dob: '1992-05-10', gender: Gender.Female, relationship: Relationship.Wife },
       { id: 'member_1_3', name: 'Phan Minh Anh', dob: '2021-06-03', gender: Gender.Female, relationship: Relationship.Child },
     ],
@@ -239,34 +238,30 @@ const App: React.FC = () => {
 
           {activeView === 'list' && (
             <>
-              <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div className="relative w-full md:flex-grow">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                      <SearchIcon className="w-5 h-5 text-gray-400" />
-                    </span>
-                    <input
-                      type="text"
-                      placeholder="Tìm kiếm chủ hộ, căn hộ..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 text-gray-700 bg-gray-100 rounded-lg border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
-                      aria-label="Tìm kiếm hộ gia đình"
-                    />
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="hidden md:block">
-                      <button
-                        onClick={handleExportCSV}
-                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-green-50 text-green-700 font-semibold rounded-lg hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition"
-                        title="Xuất ra file CSV"
-                      >
-                        <ArrowDownTrayIcon className="w-5 h-5" />
-                        <span>Xuất File</span>
-                      </button>
-                    </div>
-                  </div>
+              <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="relative w-full md:flex-grow">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <SearchIcon className="w-5 h-5 text-gray-400" />
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm chủ hộ, căn hộ..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    aria-label="Tìm kiếm hộ gia đình"
+                  />
+                </div>
+                
+                <div className="flex items-center gap-4 flex-shrink-0">
+                    <button
+                      onClick={handleExportCSV}
+                      className="flex w-full md:w-auto items-center justify-center gap-2 px-4 py-2.5 bg-green-50 text-green-700 font-semibold rounded-lg hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition"
+                      title="Xuất ra file CSV"
+                    >
+                      <ArrowDownTrayIcon className="w-5 h-5" />
+                      <span className="hidden md:inline">Xuất File</span>
+                    </button>
                 </div>
               </div>
               
