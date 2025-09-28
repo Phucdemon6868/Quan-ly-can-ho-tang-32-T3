@@ -74,7 +74,7 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-2 sm:p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[95vh] sm:max-h-[90vh] flex flex-col">
         <div className="p-4 md:p-6 border-b">
           <h2 className="text-xl md:text-2xl font-bold text-gray-800">
@@ -125,7 +125,7 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
                       <div>
                           <label className="block text-xs font-medium text-gray-600">Quan hệ với chủ hộ</label>
                            <div className="relative mt-1">
-                                <select value={member.relationship || Relationship.None} onChange={(e) => handleMemberChange(member.id, 'relationship', e.target.value as Relationship)} className="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                <select value={member.relationship || Relationship.None} onChange={(e) => handleMemberChange(member.id, 'relationship', e.target.value as Relationship)} className="appearance-none w-full px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
                                     <option value={Relationship.None}>-- Chọn --</option>
                                     <option value={Relationship.Wife}>Vợ</option>
                                     <option value={Relationship.Husband}>Chồng</option>
@@ -148,7 +148,7 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
                               <button
                                   type="button"
                                   onClick={() => handleMemberChange(member.id, 'gender', Gender.Male)}
-                                  className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-md transition-colors text-sm font-semibold ${member.gender === Gender.Male ? 'bg-blue-500 text-white shadow' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                                  className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-md transition-colors text-sm font-semibold border ${member.gender === Gender.Male ? 'bg-blue-500 text-white border-blue-500 shadow' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                               >
                                   <MaleIcon className="w-4 h-4" />
                                   <span>Nam</span>
@@ -156,7 +156,7 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
                               <button
                                   type="button"
                                   onClick={() => handleMemberChange(member.id, 'gender', Gender.Female)}
-                                  className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-md transition-colors text-sm font-semibold ${member.gender === Gender.Female ? 'bg-pink-500 text-white shadow' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                                  className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-md transition-colors text-sm font-semibold border ${member.gender === Gender.Female ? 'bg-pink-500 text-white border-pink-500 shadow' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                               >
                                   <FemaleIcon className="w-4 h-4" />
                                   <span>Nữ</span>
