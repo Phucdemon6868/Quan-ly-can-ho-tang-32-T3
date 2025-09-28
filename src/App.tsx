@@ -269,7 +269,7 @@ const App: React.FC = () => {
           </div>
 
           <div className="absolute left-1/2 -translate-x-1/2">
-            <LogoIcon className="h-20 w-auto" />
+            <LogoIcon className="h-14 w-auto" />
           </div>
 
           <div>
