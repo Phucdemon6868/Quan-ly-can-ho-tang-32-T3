@@ -8,8 +8,8 @@ import SearchIcon from './components/icons/SearchIcon';
 import ArrowDownTrayIcon from './components/icons/ArrowDownTrayIcon';
 import Dashboard from './components/Dashboard';
 import { Gender } from './types';
-import Bars3Icon from './components/icons/Bars3Icon';
-import ChartBarIcon from './components/icons/ChartBarIcon';
+import TableCellsIcon from './components/icons/TableCellsIcon';
+import ChartPieIcon from './components/icons/ChartPieIcon';
 
 
 const INITIAL_HOUSEHOLDS: Household[] = [
@@ -207,30 +207,12 @@ const App: React.FC = () => {
     view: ActiveView;
     icon: React.ReactNode;
     label: string;
-    isSidebar?: boolean;
-  }> = ({ view, icon, label, isSidebar = false }) => {
+  }> = ({ view, icon, label }) => {
     const isActive = activeView === view;
-    const baseClasses = "transition-colors focus:outline-none";
-    
-    if (isSidebar) {
-      return (
-        <button
-          onClick={() => setActiveView(view)}
-          className={`${baseClasses} p-3 rounded-lg focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-            isActive ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-100'
-          }`}
-          aria-label={label}
-          title={label}
-        >
-          {icon}
-        </button>
-      );
-    }
-
     return (
        <button
         onClick={() => setActiveView(view)}
-        className={`${baseClasses} flex flex-col items-center justify-center w-full pt-2 pb-1 rounded-md`}
+        className="flex flex-col items-center justify-center w-full pt-2 pb-1 transition-colors duration-200"
         aria-label={label}
       >
         <div className={`p-1 rounded-full ${isActive ? 'text-blue-600' : 'text-gray-500'}`}>
@@ -242,15 +224,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-      {/* Sidebar for Desktop */}
-      <nav className="hidden md:flex w-20 bg-white shadow-md p-4 flex-col items-center gap-6 pt-8">
-        <NavButton view="list" icon={<Bars3Icon className="w-7 h-7" />} label="Danh sách" isSidebar />
-        <NavButton view="dashboard" icon={<ChartBarIcon className="w-7 h-7" />} label="Thống kê" isSidebar />
-      </nav>
-
-      {/* Main Content */}
-      <main className="flex-1 pb-20 md:pb-0">
+    <div className="min-h-screen bg-gray-50 text-gray-800">
+      <main className="pb-24">
         <div className="container mx-auto p-4 sm:p-6 lg:p-8">
           <header className="mb-6 text-center">
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
@@ -260,30 +235,31 @@ const App: React.FC = () => {
           
           {activeView === 'list' && (
             <>
-              <div className="mb-6 flex flex-row items-center gap-4">
-                <div className="relative flex-grow">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <SearchIcon className="w-5 h-5 text-gray-400" />
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="Tìm kiếm chủ hộ, căn hộ..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                    aria-label="Tìm kiếm hộ gia đình"
-                  />
-                </div>
-                
-                <div className="flex-shrink-0">
-                    <button
-                      onClick={handleExportCSV}
-                      className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 bg-green-50 text-green-700 font-semibold rounded-lg hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition"
-                      title="Xuất ra file CSV"
-                    >
-                      <ArrowDownTrayIcon className="w-5 h-5" />
-                      <span className="hidden sm:inline">Xuất File</span>
-                    </button>
+              <div className="sticky top-0 bg-gray-50/80 backdrop-blur-sm z-10 py-4 -mx-4 px-4 mb-4 border-b border-gray-200">
+                <div className="container mx-auto flex items-center gap-2 sm:gap-4">
+                  <div className="relative flex-grow">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                      <SearchIcon className="w-5 h-5 text-gray-400" />
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Tìm kiếm..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 text-gray-700 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      aria-label="Tìm kiếm hộ gia đình"
+                    />
+                  </div>
+                  
+                  <div className="flex-shrink-0">
+                      <button
+                        onClick={handleExportCSV}
+                        className="flex items-center justify-center p-2.5 bg-white text-gray-600 border border-gray-200 font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+                        title="Xuất ra file CSV"
+                      >
+                        <ArrowDownTrayIcon className="w-5 h-5" />
+                      </button>
+                  </div>
                 </div>
               </div>
               
@@ -302,10 +278,28 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Bottom Navigation for Mobile */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white shadow-[0_-2px_5px_rgba(0,0,0,0.08)] flex justify-around items-center z-40">
-        <NavButton view="list" icon={<Bars3Icon className="w-6 h-6" />} label="Danh sách" />
-        <NavButton view="dashboard" icon={<ChartBarIcon className="w-6 h-6" />} label="Thống kê" />
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 inset-x-0 bg-white/80 backdrop-blur-sm shadow-[0_-2px_5px_rgba(0,0,0,0.05)] flex justify-around items-center z-40 h-16">
+        <div className="w-1/3">
+           <NavButton view="list" icon={<TableCellsIcon className="w-6 h-6" />} label="Danh sách" />
+        </div>
+        
+        <div className="w-1/3 flex justify-center">
+          {activeView === 'list' && (
+            <button
+              onClick={handleOpenAddModal}
+              className="absolute -top-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-110"
+              title="Thêm hộ gia đình mới"
+              aria-label="Thêm hộ gia đình mới"
+            >
+              <PlusIcon className="w-7 h-7" />
+            </button>
+          )}
+        </div>
+
+        <div className="w-1/3">
+           <NavButton view="dashboard" icon={<ChartPieIcon className="w-6 h-6" />} label="Thống kê" />
+        </div>
       </nav>
 
       <HouseholdFormModal
@@ -322,17 +316,6 @@ const App: React.FC = () => {
         title="Xác nhận xóa"
         message="Bạn có chắc chắn muốn xóa hộ gia đình này không? Hành động này không thể được hoàn tác."
       />
-
-      {activeView === 'list' && (
-        <button
-          onClick={handleOpenAddModal}
-          className="fixed bottom-20 md:bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-110 z-30"
-          title="Thêm hộ gia đình mới"
-          aria-label="Thêm hộ gia đình mới"
-        >
-          <PlusIcon className="w-7 h-7" />
-        </button>
-      )}
     </div>
   );
 };
