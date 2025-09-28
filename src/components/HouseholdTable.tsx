@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Household, Member, Gender } from '../types';
 import TrashIcon from './icons/TrashIcon';
@@ -10,6 +11,8 @@ import BuildingOfficeIcon from './icons/BuildingOfficeIcon';
 import PhoneIcon from './icons/PhoneIcon';
 import UsersIcon from './icons/UsersIcon';
 import ClipboardDocumentListIcon from './icons/ClipboardDocumentListIcon';
+import MaleIcon from './icons/MaleIcon';
+import FemaleIcon from './icons/FemaleIcon';
 
 type SortableKey = 'stt' | 'headOfHouseholdName' | 'apartmentNumber' | 'phone';
 
@@ -98,23 +101,27 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
             {households.length === 0 ? (
               <tr><td colSpan={numberOfColumns} className="px-6 py-12 text-center text-gray-500">{getEmptyStateMessage()}</td></tr>
             ) : (
-              households.map((household) => {
-                const membersToDisplay = household.members;
-                return (
+              households.map((household) => (
                 <React.Fragment key={household.id}>
                   <tr className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="px-2 py-4 text-center">
-                      {membersToDisplay.length > 0 && (
+                      {household.members.length > 0 && (
                         <button onClick={() => toggleRow(household.id)} className="p-1 rounded-full hover:bg-gray-200 transition-colors">
                           {expandedRows.has(household.id) ? <ChevronUpIcon /> : <ChevronDownIcon />}
                         </button>
                       )}
                     </td>
                     <td className="px-4 py-4 align-middle font-medium text-gray-900 text-center">{household.stt}</td>
-                    <td className="px-6 py-4 align-middle text-red-600 font-semibold">{household.headOfHouseholdName}</td>
+                    <td className="px-6 py-4 align-middle text-red-600 font-semibold">
+                      <div className="flex items-center gap-2">
+                        <span>{household.headOfHouseholdName}</span>
+                        {household.headOfHouseholdGender === Gender.Male && <MaleIcon className="w-4 h-4 text-blue-500" />}
+                        {household.headOfHouseholdGender === Gender.Female && <FemaleIcon className="w-4 h-4 text-pink-500" />}
+                      </div>
+                    </td>
                     <td className="px-6 py-4 align-middle">{household.apartmentNumber}</td>
                     <td className="px-6 py-4 align-middle">
-                      <span className="px-2.5 py-1 text-sm font-semibold rounded-full bg-gray-200 text-gray-700">{membersToDisplay.length}</span>
+                      <span className="px-2.5 py-1 text-sm font-semibold rounded-full bg-gray-200 text-gray-700">{household.members.length}</span>
                     </td>
                     <td className="px-6 py-4 align-middle">{household.phone}</td>
                     <td className="px-6 py-4 align-middle">{household.notes}</td>
@@ -125,7 +132,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                       </div>
                     </td>
                   </tr>
-                  {expandedRows.has(household.id) && membersToDisplay.length > 0 && (
+                  {expandedRows.has(household.id) && household.members.length > 0 && (
                     <tr className="bg-gray-50"><td colSpan={numberOfColumns} className="p-0">
                       <div className="p-4">
                         <h4 className="text-md font-semibold text-gray-700 mb-3 ml-2">Chi tiết thành viên</h4>
@@ -133,15 +140,17 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                           <tr>
                             <th className="px-6 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Họ và tên</th>
                             <th className="px-6 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Quan hệ</th>
+                             <th className="px-6 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">SĐT</th>
                             <th className="px-6 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Ngày Sinh</th>
                             <th className="px-6 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Giới tính</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
-                          {membersToDisplay.map(member => (
+                          {household.members.map(member => (
                             <tr key={member.id}>
                               <td className="px-6 py-3 whitespace-nowrap">{member.name}</td>
                               <td className="px-6 py-3 whitespace-nowrap">{member.relationship || 'N/A'}</td>
+                              <td className="px-6 py-3 whitespace-nowrap">{member.phone || 'N/A'}</td>
                               <td className="px-6 py-3 whitespace-nowrap">{formatDateForDisplay(member.dob)}</td>
                               <td className="px-6 py-3 whitespace-nowrap"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${genderCellStyle(member.gender)}`}>{member.gender}</span></td>
                             </tr>
@@ -151,7 +160,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                     </td></tr>
                   )}
                 </React.Fragment>
-              )})
+              ))
             )}
           </tbody>
         </table>
@@ -164,9 +173,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
             {getEmptyStateMessage()}
           </div>
         ) : (
-          households.map((household) => {
-            const membersToDisplay = household.members;
-            return (
+          households.map((household) => (
             <div key={household.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-shadow duration-300 hover:shadow-lg">
               <div className="p-5">
                 <div className="flex justify-between items-start">
@@ -183,13 +190,17 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                 </div>
 
                 <div className="mt-4">
-                  <p className="text-xl font-bold text-blue-700 truncate" title={household.headOfHouseholdName}>{household.headOfHouseholdName}</p>
+                  <p className="text-xl font-bold text-blue-700 truncate flex items-center gap-2" title={household.headOfHouseholdName}>
+                    <span>{household.headOfHouseholdName}</span>
+                    {household.headOfHouseholdGender === Gender.Male && <MaleIcon className="w-5 h-5 text-blue-500" />}
+                    {household.headOfHouseholdGender === Gender.Female && <FemaleIcon className="w-5 h-5 text-pink-500" />}
+                  </p>
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-gray-200 space-y-3 text-sm">
                   <div className="flex items-center gap-3 text-gray-700">
                     <UsersIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                    <span>{membersToDisplay.length} thành viên</span>
+                    <span>{household.members.length} thành viên</span>
                   </div>
                   <div className="flex items-center gap-3 text-gray-700">
                     <PhoneIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
@@ -204,7 +215,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                 </div>
               </div>
 
-              {membersToDisplay.length > 0 && (
+              {household.members.length > 0 && (
                 <>
                   <button onClick={() => toggleRow(household.id)} className="w-full border-t border-gray-200 px-5 py-3 text-sm font-medium text-blue-600 bg-blue-50/50 hover:bg-blue-100/70 flex justify-between items-center transition-colors">
                     <span>{expandedRows.has(household.id) ? 'Ẩn chi tiết' : `Xem chi tiết thành viên`}</span>
@@ -213,15 +224,18 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                   {expandedRows.has(household.id) && (
                     <div className="p-4 bg-gray-50 border-t border-gray-200">
                       <div className="space-y-3">
-                        {membersToDisplay.map(member => (
-                          <div key={member.id} className="text-sm p-3 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
-                            <div>
-                                <p className="text-gray-800 font-semibold">{member.name} <span className="text-gray-500 font-normal">({member.relationship || 'Chưa rõ'})</span></p>
-                                <p className="text-gray-500 text-xs mt-1">Ngày sinh: {formatDateForDisplay(member.dob)}</p>
+                        {household.members.map(member => (
+                          <div key={member.id} className="text-sm p-3 bg-white rounded-lg border border-gray-200">
+                             <div className="flex justify-between items-center">
+                                <div>
+                                    <p className="text-gray-800 font-semibold">{member.name} <span className="text-gray-500 font-normal">({member.relationship || 'Chưa rõ'})</span></p>
+                                    <p className="text-gray-500 text-xs mt-1">Ngày sinh: {formatDateForDisplay(member.dob)}</p>
+                                     <p className="text-gray-500 text-xs mt-1">SĐT: {member.phone || 'N/A'}</p>
+                                </div>
+                                <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${genderCellStyle(member.gender)}`}>
+                                    {member.gender || 'N/A'}
+                                </span>
                             </div>
-                            <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${genderCellStyle(member.gender)}`}>
-                                {member.gender || 'N/A'}
-                            </span>
                           </div>
                         ))}
                       </div>
@@ -230,7 +244,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                 </>
               )}
             </div>
-          )})
+          ))
         )}
       </div>
     </>

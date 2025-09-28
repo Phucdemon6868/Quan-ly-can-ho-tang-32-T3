@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Household, Member, Gender, Relationship } from '../types';
 import TrashIcon from './icons/TrashIcon';
@@ -19,6 +20,8 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
     stt: 0,
     apartmentNumber: '',
     headOfHouseholdName: '',
+    headOfHouseholdDob: '',
+    headOfHouseholdGender: Gender.None,
     phone: '',
     notes: '',
     members: []
@@ -33,6 +36,8 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
         stt: 0,
         apartmentNumber: '',
         headOfHouseholdName: '',
+        headOfHouseholdDob: '',
+        headOfHouseholdGender: Gender.None,
         phone: '',
         notes: '',
         members: []
@@ -44,6 +49,10 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
     const { name, value } = e.target;
     setHouseholdData(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleHeadOfHouseholdChange = (field: keyof Household, value: string | Gender) => {
+     setHouseholdData(prev => ({ ...prev, [field]: value }));
+  }
   
   const handleMemberChange = (memberId: string, field: keyof Member, value: string | Gender) => {
     setHouseholdData(prev => ({
@@ -53,7 +62,7 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
   };
 
   const handleAddMember = () => {
-    const newMember: Member = { id: `member_${Date.now()}`, name: '', dob: '', gender: Gender.None, relationship: Relationship.None };
+    const newMember: Member = { id: `member_${Date.now()}`, name: '', dob: '', gender: Gender.None, relationship: Relationship.None, phone: '' };
     setHouseholdData(prev => ({ ...prev, members: [...prev.members, newMember] }));
   };
 
@@ -83,17 +92,32 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
         </div>
         <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto">
           <div className="p-4 md:p-6 space-y-6">
-            <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin chung</h3>
+            <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin chủ hộ</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                  <label htmlFor="headOfHouseholdName" className="block text-sm font-medium text-gray-700 mb-1">Tên chủ hộ</label>
+                  <input type="text" name="headOfHouseholdName" value={householdData.headOfHouseholdName} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+              </div>
               <div>
-                <label htmlFor="headOfHouseholdName" className="block text-sm font-medium text-gray-700 mb-1">Tên chủ hộ</label>
-                <input type="text" name="headOfHouseholdName" value={householdData.headOfHouseholdName} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
+                  <label htmlFor="headOfHouseholdDob" className="block text-sm font-medium text-gray-700 mb-1">Ngày sinh</label>
+                  <input type="date" name="headOfHouseholdDob" value={householdData.headOfHouseholdDob} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+              </div>
+              <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Giới tính</label>
+                  <div className="flex gap-2 mt-1">
+                      <button type="button" onClick={() => handleHeadOfHouseholdChange('headOfHouseholdGender', Gender.Male)} className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-md transition-colors text-sm font-semibold border ${householdData.headOfHouseholdGender === Gender.Male ? 'bg-blue-500 text-white border-blue-500 shadow' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                          <MaleIcon className="w-4 h-4" /><span>Nam</span>
+                      </button>
+                      <button type="button" onClick={() => handleHeadOfHouseholdChange('headOfHouseholdGender', Gender.Female)} className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-md transition-colors text-sm font-semibold border ${householdData.headOfHouseholdGender === Gender.Female ? 'bg-pink-500 text-white border-pink-500 shadow' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                          <FemaleIcon className="w-4 h-4" /><span>Nữ</span>
+                      </button>
+                  </div>
               </div>
               <div>
                 <label htmlFor="apartmentNumber" className="block text-sm font-medium text-gray-700 mb-1">Số căn hộ</label>
                 <input type="text" name="apartmentNumber" value={householdData.apartmentNumber} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required />
               </div>
-              <div className="md:col-span-2">
+              <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
                 <input type="tel" name="phone" value={householdData.phone} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
               </div>
@@ -114,18 +138,17 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
                       </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="sm:col-span-2">
+                      <div>
                           <label className="block text-xs font-medium text-gray-600">Họ và tên</label>
                           <input type="text" value={member.name} onChange={(e) => handleMemberChange(member.id, 'name', e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm" required />
                       </div>
+                       <div>
+                          <label className="block text-xs font-medium text-gray-600">Số điện thoại</label>
+                          <input type="tel" value={member.phone || ''} onChange={(e) => handleMemberChange(member.id, 'phone', e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm" />
+                      </div>
                       <div>
                           <label className="block text-xs font-medium text-gray-600">Ngày sinh</label>
-                          <input
-                            type="date"
-                            value={member.dob}
-                            onChange={(e) => handleMemberChange(member.id, 'dob', e.target.value)}
-                            className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm"
-                          />
+                          <input type="date" value={member.dob} onChange={(e) => handleMemberChange(member.id, 'dob', e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm" />
                       </div>
                       <div>
                           <label className="block text-xs font-medium text-gray-600">Quan hệ với chủ hộ</label>
@@ -150,21 +173,11 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
                       <div className="sm:col-span-2">
                           <label className="block text-xs font-medium text-gray-600 mb-2">Giới tính</label>
                           <div className="flex gap-2">
-                              <button
-                                  type="button"
-                                  onClick={() => handleMemberChange(member.id, 'gender', Gender.Male)}
-                                  className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-md transition-colors text-sm font-semibold border ${member.gender === Gender.Male ? 'bg-blue-500 text-white border-blue-500 shadow' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
-                              >
-                                  <MaleIcon className="w-4 h-4" />
-                                  <span>Nam</span>
+                              <button type="button" onClick={() => handleMemberChange(member.id, 'gender', Gender.Male)} className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-md transition-colors text-sm font-semibold border ${member.gender === Gender.Male ? 'bg-blue-500 text-white border-blue-500 shadow' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                                  <MaleIcon className="w-4 h-4" /><span>Nam</span>
                               </button>
-                              <button
-                                  type="button"
-                                  onClick={() => handleMemberChange(member.id, 'gender', Gender.Female)}
-                                  className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-md transition-colors text-sm font-semibold border ${member.gender === Gender.Female ? 'bg-pink-500 text-white border-pink-500 shadow' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
-                              >
-                                  <FemaleIcon className="w-4 h-4" />
-                                  <span>Nữ</span>
+                              <button type="button" onClick={() => handleMemberChange(member.id, 'gender', Gender.Female)} className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-md transition-colors text-sm font-semibold border ${member.gender === Gender.Female ? 'bg-pink-500 text-white border-pink-500 shadow' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                                  <FemaleIcon className="w-4 h-4" /><span>Nữ</span>
                               </button>
                           </div>
                       </div>

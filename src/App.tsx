@@ -1,5 +1,6 @@
+
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { Household, Relationship } from './types';
+import { Household, Relationship, Gender } from './types';
 import HouseholdTable from './components/HouseholdTable';
 import HouseholdFormModal from './components/HouseholdFormModal';
 import ConfirmationModal from './components/ConfirmationModal';
@@ -7,7 +8,6 @@ import PlusIcon from './components/icons/PlusIcon';
 import SearchIcon from './components/icons/SearchIcon';
 import ArrowDownTrayIcon from './components/icons/ArrowDownTrayIcon';
 import Dashboard from './components/Dashboard';
-import { Gender } from './types';
 import LogoIcon from './components/icons/LogoIcon';
 import Bars3Icon from './components/icons/Bars3Icon';
 import Sidebar from './components/Sidebar';
@@ -19,11 +19,13 @@ const INITIAL_HOUSEHOLDS: Household[] = [
     stt: 1,
     apartmentNumber: '32T3',
     headOfHouseholdName: 'Phan Trọng Phúc',
+    headOfHouseholdDob: '1990-01-01',
+    headOfHouseholdGender: Gender.Male,
     phone: '0982243173',
     notes: 'Unity and Love',
     members: [
-      { id: 'member_1_2', name: 'Lê Thị Mai Hương', dob: '1992-05-10', gender: Gender.Female, relationship: Relationship.Wife },
-      { id: 'member_1_3', name: 'Phan Minh Anh', dob: '2021-06-03', gender: Gender.Female, relationship: Relationship.Child },
+      { id: 'member_1_2', name: 'Lê Thị Mai Hương', dob: '1992-05-10', gender: Gender.Female, relationship: Relationship.Wife, phone: '0987654321' },
+      { id: 'member_1_3', name: 'Phan Minh Anh', dob: '2021-06-03', gender: Gender.Female, relationship: Relationship.Child, phone: '' },
     ],
   },
    {
@@ -31,10 +33,12 @@ const INITIAL_HOUSEHOLDS: Household[] = [
     stt: 2,
     apartmentNumber: '3203',
     headOfHouseholdName: 'Nguyễn Văn A',
+    headOfHouseholdDob: '1985-02-20',
+    headOfHouseholdGender: Gender.Male,
     phone: '0123456789',
     notes: '',
     members: [
-      { id: 'member_2_1', name: 'Trần Thị B', dob: '1995-01-15', gender: Gender.Female, relationship: Relationship.Wife },
+      { id: 'member_2_1', name: 'Trần Thị B', dob: '1995-01-15', gender: Gender.Female, relationship: Relationship.Wife, phone: '' },
     ],
   },
 ];
@@ -133,7 +137,8 @@ const App: React.FC = () => {
           household.apartmentNumber.toLowerCase().includes(lowerCaseSearchTerm) ||
           household.phone.toLowerCase().includes(lowerCaseSearchTerm) ||
           household.members.some(member => 
-            member.name.toLowerCase().includes(lowerCaseSearchTerm)
+            member.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+            member.phone?.toLowerCase().includes(lowerCaseSearchTerm)
           )
         );
     }
@@ -163,31 +168,36 @@ const App: React.FC = () => {
   };
 
   const handleExportCSV = () => {
-    const headers = ['STT', 'Số căn', 'Chủ hộ', 'SĐT', 'Ghi chú', 'Tên thành viên', 'Ngày sinh', 'Giới tính', 'Quan hệ'];
+    const headers = ['STT', 'Số căn', 'Họ tên', 'Ngày sinh', 'Giới tính', 'Quan hệ', 'SĐT', 'Ghi chú'];
   
     const rows = sortedAndFilteredHouseholds.flatMap(household => {
-      const members = household.members;
-      if (members.length === 0) {
-        return [[
-          household.stt,
-          household.apartmentNumber,
-          household.headOfHouseholdName,
-          household.phone,
-          household.notes,
-          '', '', '', ''
-        ]];
-      }
-      return members.map(member => [
+      const householdRows: (string | number)[][] = [];
+      
+      householdRows.push([
         household.stt,
         household.apartmentNumber,
         household.headOfHouseholdName,
+        formatDateForExport(household.headOfHouseholdDob),
+        household.headOfHouseholdGender,
+        Relationship.HeadOfHousehold,
         household.phone,
         household.notes,
-        member.name,
-        formatDateForExport(member.dob),
-        member.gender,
-        member.relationship || ''
       ]);
+
+      household.members.forEach(member => {
+        householdRows.push([
+          household.stt,
+          household.apartmentNumber,
+          member.name,
+          formatDateForExport(member.dob),
+          member.gender,
+          member.relationship || '',
+          member.phone || '',
+          ''
+        ]);
+      });
+      
+      return householdRows;
     });
   
     const escapeCsvCell = (cell: any): string => {
