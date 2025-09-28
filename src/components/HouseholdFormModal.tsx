@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Household, Member, Gender } from '../types';
+import { Household, Member, Gender, Relationship } from '../types';
 import TrashIcon from './icons/TrashIcon';
 import PlusIcon from './icons/PlusIcon';
 
@@ -50,7 +50,7 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
   };
 
   const handleAddMember = () => {
-    const newMember: Member = { id: `member_${Date.now()}`, name: '', dob: '', gender: Gender.None };
+    const newMember: Member = { id: `member_${Date.now()}`, name: '', dob: '', gender: Gender.None, relationship: Relationship.None };
     setHouseholdData(prev => ({ ...prev, members: [...prev.members, newMember] }));
   };
 
@@ -103,30 +103,47 @@ const HouseholdFormModal: React.FC<HouseholdFormModalProps> = ({ isOpen, onClose
             <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 pt-4">Danh sách thành viên</h3>
             <div className="space-y-4">
               {householdData.members.map((member, index) => (
-                <div key={member.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-md relative bg-gray-50">
-                   <div className="md:col-span-4 text-sm font-bold text-gray-600">Thành viên {index + 1}</div>
-                   <div>
-                    <label className="block text-xs font-medium text-gray-600">Họ và tên</label>
-                    <input type="text" value={member.name} onChange={(e) => handleMemberChange(member.id, 'name', e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm" required />
+                <div key={member.id} className="p-4 border rounded-md bg-gray-50">
+                  <div className="flex justify-between items-center mb-3">
+                      <p className="text-sm font-bold text-gray-600">Thành viên {index + 1}</p>
+                      <button type="button" onClick={() => handleRemoveMember(member.id)} className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition-colors">
+                          <TrashIcon />
+                      </button>
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600">Ngày sinh</label>
-                    <input type="text" value={member.dob} placeholder="dd/mm/yyyy" onChange={(e) => handleMemberChange(member.id, 'dob', e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                          <label className="block text-xs font-medium text-gray-600">Họ và tên</label>
+                          <input type="text" value={member.name} onChange={(e) => handleMemberChange(member.id, 'name', e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm" required />
+                      </div>
+                      <div>
+                          <label className="block text-xs font-medium text-gray-600">Quan hệ với chủ hộ</label>
+                          <select value={member.relationship || Relationship.None} onChange={(e) => handleMemberChange(member.id, 'relationship', e.target.value as Relationship)} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm">
+                              <option value={Relationship.None}>-- Chọn --</option>
+                              <option value={Relationship.Wife}>Vợ</option>
+                              <option value={Relationship.Husband}>Chồng</option>
+                              <option value={Relationship.Child}>Con</option>
+                              <option value={Relationship.Father}>Bố</option>
+                              <option value={Relationship.Mother}>Mẹ</option>
+                              <option value={Relationship.OlderBrother}>Anh</option>
+                              <option value={Relationship.OlderSister}>Chị</option>
+                              <option value={Relationship.YoungerSibling}>Em</option>
+                              <option value={Relationship.Relative}>Người thân</option>
+                          </select>
+                      </div>
+                      <div>
+                          <label className="block text-xs font-medium text-gray-600">Ngày sinh</label>
+                          <input type="text" value={member.dob} placeholder="dd/mm/yyyy" onChange={(e) => handleMemberChange(member.id, 'dob', e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm" />
+                      </div>
+                      <div>
+                          <label className="block text-xs font-medium text-gray-600">Giới tính</label>
+                          <select value={member.gender} onChange={(e) => handleMemberChange(member.id, 'gender', e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm">
+                              <option value={Gender.None}>-- Chọn --</option>
+                              <option value={Gender.Male}>Nam</option>
+                              <option value={Gender.Female}>Nữ</option>
+                          </select>
+                      </div>
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600">Giới tính</label>
-                    <select value={member.gender} onChange={(e) => handleMemberChange(member.id, 'gender', e.target.value)} className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm">
-                      <option value={Gender.None}></option>
-                      <option value={Gender.Male}>Nam</option>
-                      <option value={Gender.Female}>Nữ</option>
-                    </select>
-                  </div>
-                  <div className="flex items-end">
-                    <button type="button" onClick={() => handleRemoveMember(member.id)} className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-100">
-                      <TrashIcon />
-                    </button>
-                  </div>
-                </div>
+              </div>
               ))}
               <button type="button" onClick={handleAddMember} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 border-2 border-dashed border-gray-300 rounded-md hover:bg-blue-50 transition-colors">
                 <PlusIcon className="w-5 h-5" />

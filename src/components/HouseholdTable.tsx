@@ -124,6 +124,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                         <table className="min-w-full"><thead className="bg-gray-200">
                           <tr>
                             <th className="px-6 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Họ và tên</th>
+                            <th className="px-6 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Quan hệ</th>
                             <th className="px-6 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Ngày Sinh</th>
                             <th className="px-6 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Giới tính</th>
                           </tr>
@@ -132,6 +133,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                           {household.members.map(member => (
                             <tr key={member.id}>
                               <td className="px-6 py-3 whitespace-nowrap">{member.name}</td>
+                              <td className="px-6 py-3 whitespace-nowrap">{member.relationship || 'N/A'}</td>
                               <td className="px-6 py-3 whitespace-nowrap">{member.dob}</td>
                               <td className="px-6 py-3 whitespace-nowrap"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${genderCellStyle(member.gender)}`}>{member.gender}</span></td>
                             </tr>
@@ -204,7 +206,7 @@ const HouseholdTable: React.FC<HouseholdTableProps> = ({ households, onEdit, onD
                         {household.members.map(member => (
                           <div key={member.id} className="text-sm p-3 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
                             <div>
-                                <p className="text-gray-800 font-semibold">{member.name}</p>
+                                <p className="text-gray-800 font-semibold">{member.name} <span className="text-gray-500 font-normal">({member.relationship || 'Chưa rõ'})</span></p>
                                 <p className="text-gray-500 text-xs mt-1">Ngày sinh: {member.dob || 'N/A'}</p>
                             </div>
                             <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${genderCellStyle(member.gender)}`}>

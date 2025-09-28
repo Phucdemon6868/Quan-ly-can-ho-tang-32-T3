@@ -146,7 +146,7 @@ const App: React.FC = () => {
   }, [households, searchTerm, genderFilter, sortConfig]);
 
   const handleExportCSV = () => {
-    const headers = ['STT', 'Số căn', 'Chủ hộ', 'SĐT', 'Ghi chú', 'Tên thành viên', 'Ngày sinh', 'Giới tính'];
+    const headers = ['STT', 'Số căn', 'Chủ hộ', 'SĐT', 'Ghi chú', 'Tên thành viên', 'Ngày sinh', 'Giới tính', 'Quan hệ'];
   
     const rows = sortedAndFilteredHouseholds.flatMap(household => {
       if (household.members.length === 0) {
@@ -156,7 +156,7 @@ const App: React.FC = () => {
           household.headOfHouseholdName,
           household.phone,
           household.notes,
-          '', '', '' // member details
+          '', '', '', ''
         ]];
       }
       return household.members.map(member => [
@@ -167,7 +167,8 @@ const App: React.FC = () => {
         household.notes,
         member.name,
         member.dob,
-        member.gender
+        member.gender,
+        member.relationship || ''
       ]);
     });
   
